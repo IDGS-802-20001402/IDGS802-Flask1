@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font: 1em sans-serif;
+    }
+
+    .formulario-compra,
+    .detalle-compra {
+        padding: 1em;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        background-color: white;
+    }
+
+    .formulario-compra {
+        width: 40%;
+        margin-right: 2%;
+    }
+
+    .detalle-compra {
+        width: 40%;
+        margin-left: 2%;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1em;
+    }
+
+    .input-group label {
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+
+    .input-group input[type="text"],
+    .input-group input[type="number"] {
+        padding: 0.5em;
+        border-radius: 5px;
+        border: 1px solid lightgray;
+    }
+
+    .radio-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1em;
+    }
+
+    .radio-group input[type="radio"] {
+        margin-right: 0.5em;
+    }
+
+    .radio-group label {
+        font-weight: bold;
+        margin-right: 1em;
+    }
+
+    .acciones {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+    }
+
+    .acciones button {
+        padding: 0.5em 1em;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .acciones button:hover {
+        background-color: #0069d9;
+    }
+
+    .acciones button:active {
+        transform: translateY(2px);
+    }
+
+    input[type="radio"]:checked+label {
+        background-color: #007bff;
+        color: white;
+        padding: 0.3em 0.5em;
+        border-radius: 5px;
+    }
+</style>
+
+<body>
+    <div class="formulario-compra">
+        <div class="input-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre">
+        </div>
+        <hr>
+        <div class="input-group">
+            <label for="cantidad_compradores">Cantidad compradores</label>
+            <input type="number" name="cantidad_compradores" id="cantidad_compradores">
+        </div>
+        <hr>
+        <div class="radio-group">
+            <label for="tarjeta_cineco">Tarjeta Cineco</label>
+            <input type="radio" name="tarjeta_cineco" id="tarjeta_cineco_si" value="1">
+            <label for="tarjeta_cineco">Si</label>
+            <input type="radio" name="tarjeta_cineco" id="tarjeta_cineco_no" value="0">
+            <label for="tarjeta_cineco">No</label>
+        </div>
+        <hr>
+        <div class="input-group">
+            <label for="cantidad_boletos">Cantidad de boletos</label>
+            <input type="number" name="cantidad_boletos" id="cantidad_boletos">
+        </div>
+        <div class="acciones" id="acciones">
+            <button type="button" onclick="sendData()">Enviar</button>
+            <button type="button">Cerrar</button>
+        </div>
+    </div>
+    <div class="detalle-compra">
+        <div class="input-group">
+            <label for="valor_pagar">Valor a pagar</label>
+            <input type="text" name="valor_pagar" id="valor_pagar" disabled>
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    const createFormData = () => {
+        const formData = new FormData();
+
+        formData.append('nombre', document.getElementById('nombre').value);
+        formData.append('cantidad_compradores', document.getElementById('cantidad_compradores').value);
+        const tarjeta_cineco = document.getElementsByName('tarjeta_cineco');
+        for (let i = 0; i < tarjeta_cineco.length; i++) {
+            if (tarjeta_cineco[i].checked) {
+                formData.append('tarjeta_cineco', tarjeta_cineco[i].value);
+            }
+        }
+        formData.append('cantidad_boletos', document.getElementById('cantidad_boletos').value);
+        return formData;
+    }
+
+
+    const sendData = () => {
+        fetch('/procesar', {
+            method: 'POST',
+            body: createFormData()
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById('valor_pagar').value = data.costo_final;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+</script>
+
+</html>
